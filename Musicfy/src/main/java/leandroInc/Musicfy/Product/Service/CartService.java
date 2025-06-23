@@ -5,6 +5,7 @@ import leandroInc.Musicfy.Product.model.*;
 import leandroInc.Musicfy.Product.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 
 @Service
@@ -24,38 +25,46 @@ public class CartService {
 
     @Transactional
     public CartItem adicionarItemAoCarrinho(Long productId, int quantidade) {
-        // Validações
+        // 1. Validações básicas
         if (quantidade <= 0) {
             throw new IllegalArgumentException("Quantidade deve ser positiva");
         }
 
-        // Busca o produto
-        Product produto = productRepository.findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
-
-        // Obtém o carrinho ativo
+        // 2. Busca ou cria carrinho ativo
         Cart carrinho = obterCarrinhoAtivo();
 
-        // Verifica se item já existe
-        Optional<CartItem> itemExistente = cartItemRepository
-                .findByCartIdAndProductId(carrinho.getId(), productId);
+        // 3. Busca o produto
+        Product produto = productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com ID: " + productId));
+
+        // 4. Verifica se item já existe no carrinho
+        Optional<CartItem> itemExistente = cartItemRepository.findByCartIdAndProductId(carrinho.getId(), productId);
 
         if (itemExistente.isPresent()) {
+            // Atualiza quantidade se item já existir
             CartItem item = itemExistente.get();
             item.setQuantity(item.getQuantity() + quantidade);
             return cartItemRepository.save(item);
         } else {
+            // Cria novo item se não existir
             CartItem novoItem = new CartItem(produto, quantidade);
             novoItem.setCart(carrinho);
-            carrinho.addItem(novoItem);
             return cartItemRepository.save(novoItem);
         }
     }
 
-    private Cart obterCarrinhoAtivo() {
-        // Implementação simplificada - em produção, associar ao usuário
-        return cartRepository.findAll().stream()
-                .findFirst()
+    // Método para obter ou criar carrinho ativo
+    @Transactional
+    public Cart obterCarrinhoAtivo() {
+        // Implementação básica - ajuste conforme sua lógica de negócio
+        // Pode ser:
+        // 1. Carrinho da sessão do usuário
+        // 2. Carrinho não finalizado do usuário autenticado
+        // 3. Último carrinho criado (como está abaixo)
+
+        return cartRepository.findFirstByOrderByIdDesc()
                 .orElseGet(() -> cartRepository.save(new Cart()));
     }
+
+    // Mantenha outros métodos existentes se necessário
 }

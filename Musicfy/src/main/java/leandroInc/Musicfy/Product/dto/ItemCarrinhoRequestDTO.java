@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class ItemCarrinhoRequestDTO {
-    private Long id;  // Campo obrigatório
+    private Long productId;  // Campo obrigatório
     @JsonAlias({"img", "imgPath"})
     private String img;  // ou imgPath
     private String name;

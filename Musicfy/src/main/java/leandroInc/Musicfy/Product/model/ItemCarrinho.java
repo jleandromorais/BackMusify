@@ -1,19 +1,20 @@
 package leandroInc.Musicfy.Product.model;
 
-import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class ItemCarrinho {
-    private Product product;
+    private Product productId;  // corrigido aqui: tipo Product
     private int quantidade;
 
-    public ItemCarrinho(Product product, int quantidade) {
-        this.product = product;
-        this.quantidade = quantidade;
-    }
-
-    public Product getProduct() {
-        return product;
+    public Product getProductID(Long productId) {  // getter correto, sem parâmetro
+        return this.productId;
     }
 
     public int getQuantidade() {
