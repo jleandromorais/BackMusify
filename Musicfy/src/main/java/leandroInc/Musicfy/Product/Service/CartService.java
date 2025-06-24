@@ -41,15 +41,21 @@ public class CartService {
         Optional<CartItem> itemExistente = cartItemRepository.findByCartIdAndProductId(carrinho.getId(), productId);
 
         if (itemExistente.isPresent()) {
-            // Atualiza quantidade se item já existir
+            // Se o item já existe, apenas atualiza a quantidade
             CartItem item = itemExistente.get();
             item.setQuantity(item.getQuantity() + quantidade);
             return cartItemRepository.save(item);
         } else {
-            // Cria novo item se não existir
+            // Se o item é novo, cria, adiciona ao carrinho e salva
             CartItem novoItem = new CartItem(produto, quantidade);
-            novoItem.setCart(carrinho);
-            return cartItemRepository.save(novoItem);
+
+            // Usa o método auxiliar para sincronizar os dois lados da relação
+            carrinho.addItem(novoItem);
+
+            // Salva a entidade 'pai' (Cart), e a operação será cascateada para o novo CartItem
+            cartRepository.save(carrinho);
+
+            return novoItem;
         }
     }
 
