@@ -24,7 +24,7 @@ public class CartService {
     }
 
     @Transactional
-    public CartItem adicionarItemAoCarrinho(Long productId, int quantidade) {
+    public CartItem AdcionarAoCarrinho (Long productId,int quantidade ){
         // 1. Validações básicas
         if (quantidade <= 0) {
             throw new IllegalArgumentException("Quantidade deve ser positiva");
